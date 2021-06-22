@@ -1,0 +1,61 @@
+spec.template.spec.containers[0].volumeMounts[2].name: Not found: "configMap"
+
+kubectl delete cm fluent-bit-ca
+kubectl create cm fluent-bit-ca --from-file=/home/ranjitharajamyli/certs/root-ca.pem --from-file=/home/ranjitharajamyli/fluent-bit.conf --from-file=/home/ranjitharajamyli/custom_parsers.conf --from-file=/home/ranjitharajamyli/streams.conf
+
+helm delete fluent
+helm install fluent --values=new3.yaml fluent-bit-0.15.14.tgz
+
+kubectl apply -f https://k8s.io/examples/controllers/nginx-deployment.yaml
+kubectl expose deployment nginx-deployment --type=NodePort --name=my-service
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+For others, config like this in input tail works
+
+Exclude_Path /var/log/containers/*_kube-system_*.log 
+here _kube-system_ is namespace, I had to add this to avoid it fluent-bit fetching logs of canal networking service which makes lots of load and noise.
+
+@botzill PR for the helm seems unnecessary.
+You could add this in extraEnties.input https://github.com/helm/charts/blob/master/stable/fluent-bit/values.yaml#L166
+
+I did like this
+
+extraEntries:
+  # Ignore logs from containers in kube-system namespace
+  input: |-
+      Exclude_Path /var/log/containers/*_kube-system_*.log
+
+ [INPUT]
+        Name              tail
+        Path              /var/log/containers/*.log
+        Exclude_Path      /var/log/containers/*_<myappnamespace>_*.log
+        Tag               kube.infra.<namespace_name>.<pod_name>.<container_name>
+        Tag_Regex         (?<pod_name>[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)_(?<namespace_name>[^_]+)_(?<container_name>.+)-
+        Parser            cri
+        DB                /var/log/flb_kube_infra.db
+        Mem_Buf_Limit     500KB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+SELECT kubernetes['host'] FROM STREAM:test WHERE kubernetes['host'] = worker-node2;
+
+[OUTPUT]
+  Name            es
+  Match           kube.*
+  Host            opendistro-opendistro-es-client-service
+  Port            9200
+  Logstash_Format On
+  Replace_Dots    On
+  Retry_Limit     False
+  index project-code
+  logstash_prefix project-code
+  http_user admin
+  http_passwd admin
+  tls on
+  tls.debug 4
+  tls.verify off
+  tls.ca_file /fluent-bit/etc/certs/root-ca.pem
+
+  ---------------------------------------------------------------
+
+  ab -n 100 -c 10 http://34.122.39.176:30129/
