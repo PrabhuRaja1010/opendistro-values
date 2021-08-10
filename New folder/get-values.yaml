@@ -1,0 +1,278 @@
+USER-SUPPLIED VALUES:
+elasticsearch:
+  client:
+    affinity: {}
+    dedicatedPod:
+      enabled: true
+    enabled: true
+    ingress:
+      annotations: {}
+      enabled: false
+      hosts:
+      - chart-example.local
+      labels: {}
+      path: /
+      tls: []
+    javaOpts: -Xms512m -Xmx512m
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      tcpSocket:
+        port: transport
+    nodeSelector:
+      kubernetes.io/hostname: opendistro
+    podAnnotations: {}
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: 1
+    readinessProbe: []
+    replicas: 1
+    resources: {}
+    service:
+      annotations: {}
+      type: ClusterIP
+    startupProbe: []
+    tolerations: []
+  config:
+    cluster:
+      name: elasticsearch
+    cluster.routing.allocation.disk.threshold_enabled: false
+    discovery:
+      zen:
+        minimum_master_nodes: 1
+    node.max_local_storage_nodes: 3
+    opendistro_security.allow_default_init_securityindex: true
+    opendistro_security.allow_unsafe_democertificates: false
+    opendistro_security.audit.config.disabled_rest_categories: NONE
+    opendistro_security.audit.config.disabled_transport_categories: NONE
+    opendistro_security.audit.ignore_users:
+    - kibanaserver
+    opendistro_security.audit.type: internal_elasticsearch
+    opendistro_security.authcz.admin_dn:
+    - CN=admin,OU=AppSec,O=Amex,L=Phoenix,ST=Arizona,C=US
+    opendistro_security.check_snapshot_restore_write_privileges: true
+    opendistro_security.enable_snapshot_restore_privilege: true
+    opendistro_security.nodes_dn:
+    - CN=localhost,OU=AppSec,O=Amex,L=Phoenix,ST=Arizona,C=US
+    opendistro_security.restapi.roles_enabled:
+    - all_access
+    - security_rest_api_access
+    opendistro_security.ssl.http.clientauth_mode: OPTIONAL
+    opendistro_security.ssl.http.enabled: true
+    opendistro_security.ssl.http.pemcert_filepath: elk-rest-crt.pem
+    opendistro_security.ssl.http.pemkey_filepath: elk-rest-key.pem
+    opendistro_security.ssl.http.pemtrustedcas_filepath: elk-rest-root-ca.pem
+    opendistro_security.ssl.transport.enforce_hostname_verification: false
+    opendistro_security.ssl.transport.pemcert_filepath: elk-transport-crt.pem
+    opendistro_security.ssl.transport.pemkey_filepath: elk-transport-key.pem
+    opendistro_security.ssl.transport.pemtrustedcas_filepath: elk-transport-root-ca.pem
+    path:
+      data: /usr/share/elasticsearch/data
+      logs: /usr/share/elasticsearch/logs
+    path.repo:
+    - /usr/share/elasticsearch/data/
+  configDirectory: /usr/share/elasticsearch/config
+  data:
+    affinity: {}
+    dedicatedPod:
+      enabled: true
+    enabled: true
+    javaOpts: -Xms512m -Xmx512m
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      tcpSocket:
+        port: transport
+    nodeSelector:
+      kubernetes.io/hostname: opendistro
+    persistence:
+      enabled: true
+      existingClaim: data-pvc
+    podAnnotations: {}
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: 1
+    readinessProbe: []
+    replicas: 1
+    resources: {}
+    startupProbe: []
+    tolerations: []
+    updateStrategy: RollingUpdate
+  discoveryOverride: ""
+  extraEnvs: []
+  extraInitContainers: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  fixmount:
+    enabled: true
+  image: amazon/opendistro-for-elasticsearch
+  imagePullPolicy: ""
+  imageTag: 1.13.2
+  initContainer:
+    image: busybox
+    imageTag: 1.27.2
+  log4jConfig: ""
+  loggingConfig:
+    appender:
+      console:
+        layout:
+          conversionPattern: '[%d{ISO8601}][%-5p][%-25c] %m%n'
+          type: consolePattern
+        type: console
+    es.logger.level: INFO
+    logger:
+      action: DEBUG
+      com.amazonaws: WARN
+    rootLogger: ${es.logger.level}, console
+  master:
+    affinity: {}
+    enabled: true
+    extraContainers: []
+    extraInitContainers: []
+    javaOpts: -Xms512m -Xmx512m
+    livenessProbe:
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      tcpSocket:
+        port: transport
+    nodeSelector:
+      kubernetes.io/hostname: opendistro
+    persistence:
+      enabled: true
+      existingClaim: master-pvc
+    podAnnotations: {}
+    podDisruptionBudget:
+      enabled: false
+      minAvailable: 1
+    readinessProbe: []
+    replicas: 1
+    resources: {}
+    startupProbe: []
+    tolerations: []
+    updateStrategy: RollingUpdate
+  maxMapCount: 262144
+  securityConfig:
+    actionGroupsSecret: action-groups-secret
+    config:
+      data: {}
+      securityConfigSecret: null
+    configSecret: config-secret
+    enabled: true
+    internalUsersSecret: internal-users-secret
+    path: /usr/share/elasticsearch/plugins/opendistro_security/securityconfig
+    rolesMappingSecret: roles-mapping-secret
+    rolesSecret: roles-secret
+    tenantsSecret: tenants-secret
+  securityContextCustom: {}
+  serviceAccount:
+    create: true
+    name: null
+  ssl:
+    admin:
+      enabled: true
+      existingCertSecret: admin1-secret
+      existingCertSecretCertSubPath: admin-crt.pem
+      existingCertSecretKeySubPath: admin-key.pem
+      existingCertSecretRootCASubPath: admin-root-ca.pem
+    rest:
+      enabled: true
+      existingCertSecret: rest1-secret
+      existingCertSecretCertSubPath: elk-rest-crt.pem
+      existingCertSecretKeySubPath: elk-rest-key.pem
+      existingCertSecretRootCASubPath: elk-rest-root-ca.pem
+    transport:
+      existingCertSecret: trans1-secret
+      existingCertSecretCertSubPath: elk-transport-crt.pem
+      existingCertSecretKeySubPath: elk-transport-key.pem
+      existingCertSecretRootCASubPath: elk-transport-root-ca.pem
+  sslKeyPassphrase:
+    enabled: false
+    passPhrase: null
+  sys_chroot:
+    enabled: true
+  sysctl:
+    enabled: true
+  transportKeyPassphrase:
+    enabled: false
+    passPhrase: null
+fullnameOverride: ""
+global:
+  clusterName: elasticsearch
+  imageRegistry: docker.io
+  psp:
+    create: true
+  rbac:
+    enabled: true
+kibana:
+  affinity: {}
+  certsDirectory: /usr/share/kibana/certs
+  config:
+    elasticsearch.hosts: https://opendistro-opendistro-es-client-service:9200
+    elasticsearch.password: admin
+    elasticsearch.requestHeadersWhitelist:
+    - securitytenant
+    - Authorization
+    elasticsearch.requestTimeout: 360000
+    elasticsearch.ssl.certificate: /usr/share/kibana/certs/elk-rest-crt.pem
+    elasticsearch.ssl.certificateAuthorities: /usr/share/kibana/certs/elk-rest-root-ca.pem
+    elasticsearch.ssl.key: /usr/share/kibana/certs/elk-rest-key.pem
+    elasticsearch.ssl.verificationMode: none
+    elasticsearch.username: admin
+    server.host: 0.0.0.0
+    server.name: kibana
+    server.ssl.certificate: /usr/share/kibana/certs/kibana-crt.pem
+    server.ssl.enabled: true
+    server.ssl.key: /usr/share/kibana/certs/kibana-key.pem
+  configDirectory: /usr/share/kibana/config
+  elasticsearchAccount:
+    keyPassphrase:
+      enabled: false
+    secret: ""
+  enabled: true
+  externalPort: 443
+  extraContainers: []
+  extraEnvs: []
+  extraInitContainers: []
+  extraVolumeMounts: []
+  extraVolumes: []
+  image: amazon/opendistro-for-elasticsearch-kibana
+  imagePullPolicy: ""
+  imageTag: 1.13.2
+  ingress:
+    annotations: {}
+    enabled: false
+    hosts:
+    - chart-example.local
+    labels: {}
+    path: /
+    tls: []
+  livenessProbe: []
+  nodeSelector:
+    kubernetes.io/hostname: opendistro
+  podAnnotations: {}
+  port: 5601
+  readinessProbe: []
+  replicas: 1
+  resources: {}
+  service:
+    annotations: {}
+    type: NodePort
+  serviceAccount:
+    create: true
+    name: null
+  ssl:
+    elasticsearch:
+      enabled: true
+      existingCertSecret: kibanarest1-secret
+      existingCertSecretCertSubPath: elk-rest-crt.pem
+      existingCertSecretKeySubPath: elk-rest-key.pem
+      existingCertSecretRootCASubPath: elk-rest-root-ca.pem
+    kibana:
+      enabled: true
+      existingCertSecret: kibana1-secret
+      existingCertSecretCertSubPath: kibana-crt.pem
+      existingCertSecretKeySubPath: kibana-key.pem
+      existingCertSecretRootCASubPath: kibana-root-ca.pem
+  startupProbe: []
+  tolerations: []
+nameOverride: ""
